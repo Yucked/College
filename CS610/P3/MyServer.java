@@ -49,7 +49,5 @@ public final class MyServer extends Thread{
 			server.close();
 			break;
 		}while(client.isConnected());
-
-		System.out.printf("%d CLOSED\n", port);
 	}
 }
