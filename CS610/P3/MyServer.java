@@ -45,9 +45,13 @@ public final class MyServer extends Thread{
 			}
 
 			writer.println(Integer.valueOf(msg) + 2);
-			client.close();
-			server.close();
 			break;
 		}while(client.isConnected());
+
+		inputStream.close();
+		reader.close();
+		writer.close();
+		client.close();
+		server.close();
 	}
 }
