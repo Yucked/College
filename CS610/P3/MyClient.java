@@ -4,9 +4,11 @@ import java.util.Scanner;
 
 public final class MyClient extends Thread{
 	private final int port;
+	private Object sync;
 
 	public MyClient(int port){
 		this.port = port;
+		sync = new Object();
 	}
 
 	@Override
@@ -32,15 +34,14 @@ public final class MyClient extends Thread{
 
 	private final void handleSocket() throws Exception{
 		Socket client = new Socket("0.0.0.0", port);
-		Scanner scanner = new Scanner(System.in);
 		
 		InputStreamReader inputStream = new InputStreamReader(client.getInputStream());
 		BufferedReader reader = new BufferedReader(inputStream);
 		PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
 				
 		do {
-			String input = scanner.nextLine();
-			writer.println(input);
+			String input = getInput();
+			writer.println(input);			
 
 			String msg = reader.readLine();
 			if (msg == null){
@@ -49,10 +50,26 @@ public final class MyClient extends Thread{
 			}
 
 			System.out.printf("%s + 2 is: %s\n", input, msg);
-			client.close();
 			break;
 		}while(client.isConnected());
 
-		scanner.close();
+		inputStream.close();
+		reader.close();
+		writer.close();
+		client.close();
+	}
+
+	private final String getInput() {
+		synchronized(sync){
+			Scanner scanner = new Scanner(System.in);
+			while (!scanner.hasNextLine()){
+				continue;
+			}
+
+			String input = scanner.nextLine();
+			scanner.close();
+
+			return input;
+		}
 	}
 }
